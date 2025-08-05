@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { socketGameManager } from './utils/socketGameManager';
+import { gameManager } from './utils/gameManager';
 import { VotingSession } from './types';
 import HomePage from './components/HomePage';
 import GameRoom from './components/GameRoom';
@@ -15,21 +16,27 @@ const generateRoomCode = (): string => {
   return result;
 };
 
+// Try to use Socket.IO, fallback to localStorage
+const useSocketIO = window.location.hostname === 'localhost';
+const selectedGameManager = useSocketIO ? socketGameManager : gameManager;
+
 function App() {
   const [session, setSession] = useState<VotingSession | null>(null);
   const [currentPlayerId, setCurrentPlayerId] = useState<string>('');
 
   useEffect(() => {
-    // Subscribe to socket game manager updates
-    const unsubscribe = socketGameManager.subscribe((newSession) => {
+    // Subscribe to game manager updates
+    const unsubscribe = selectedGameManager.subscribe((newSession) => {
       setSession(newSession);
     });
 
     // Load initial session
-    setSession(socketGameManager.getSession());
+    setSession(selectedGameManager.getSession());
 
-    // Load current player ID from the socket manager
-    const playerId = socketGameManager.getCurrentPlayerId();
+    // Load current player ID
+    const playerId = useSocketIO 
+      ? socketGameManager.getCurrentPlayerId()
+      : ''; // For localStorage version, we'll handle player ID differently
     if (playerId) {
       setCurrentPlayerId(playerId);
     }
@@ -48,8 +55,15 @@ function App() {
   const handleCreateGame = async (moderatorName: string, votingSystem: any): Promise<string> => {
     try {
       const roomCode = generateRoomCode();
-      const newSession = await socketGameManager.createSession(roomCode, moderatorName, votingSystem);
-      setCurrentPlayerId(newSession.moderatorId);
+      
+      if (useSocketIO) {
+        const newSession = await socketGameManager.createSession(roomCode, moderatorName, votingSystem);
+        setCurrentPlayerId(newSession.moderatorId);
+      } else {
+        const newSession = gameManager.createSession(roomCode, moderatorName, votingSystem);
+        setCurrentPlayerId(newSession.moderatorId);
+      }
+      
       return roomCode;
     } catch (error) {
       console.error('Failed to create game:', error);
@@ -59,7 +73,11 @@ function App() {
   };
 
   const handleLeaveGame = () => {
-    socketGameManager.leaveSession();
+    if (useSocketIO) {
+      socketGameManager.leaveSession();
+    } else {
+      gameManager.clearSession();
+    }
     setCurrentPlayerId('');
   };
 
