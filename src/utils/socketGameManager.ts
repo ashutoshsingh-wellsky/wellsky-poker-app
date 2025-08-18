@@ -17,10 +17,13 @@ class SocketGameManager {
       ? 'http://localhost:3001'
       : window.location.origin; // Use same origin for production (Vercel)
       
+    // Different configurations for local vs production
+    const isLocal = window.location.hostname === 'localhost';
+    
     this.socket = io(socketUrl, {
-      path: '/socket.io/', // Standard Socket.IO path (will be rewritten by Vercel)
-      transports: ['polling'], // Use polling only for Vercel compatibility
-      upgrade: false, // Disable upgrade to websocket for Vercel
+      path: '/socket.io/', // Standard Socket.IO path
+      transports: isLocal ? ['websocket', 'polling'] : ['polling'], // Full transports for local, polling-only for Vercel
+      upgrade: isLocal, // Allow upgrade locally, disable for Vercel
       timeout: 20000,
       forceNew: true,
       reconnection: true,
