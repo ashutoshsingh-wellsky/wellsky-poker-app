@@ -17,13 +17,8 @@ class SocketGameManager {
       ? 'http://localhost:3001'
       : window.location.origin; // Use same origin for production (Vercel)
       
-    // For Vercel deployment, use the custom path
-    const socketPath = window.location.hostname === 'localhost' 
-      ? '/socket.io/' 
-      : '/api/socket.js';
-      
     this.socket = io(socketUrl, {
-      path: socketPath,
+      path: '/socket.io/', // Standard Socket.IO path (will be rewritten by Vercel)
       transports: ['polling'], // Use polling only for Vercel compatibility
       upgrade: false, // Disable upgrade to websocket for Vercel
       timeout: 20000,
