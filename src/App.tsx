@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { socketGameManager } from './utils/socketGameManager';
-import { gameManager } from './utils/gameManager';
 import { VotingSession } from './types';
 import HomePage from './components/HomePage';
 import GameRoom from './components/GameRoom';
@@ -16,27 +15,22 @@ const generateRoomCode = (): string => {
   return result;
 };
 
-// Try to use Socket.IO, fallback to localStorage
-const useSocketIO = window.location.hostname === 'localhost';
-const selectedGameManager = useSocketIO ? socketGameManager : gameManager;
-
 function App() {
   const [session, setSession] = useState<VotingSession | null>(null);
   const [currentPlayerId, setCurrentPlayerId] = useState<string>('');
+  const [roomCodeFromUrl, setRoomCodeFromUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    // Subscribe to game manager updates
-    const unsubscribe = selectedGameManager.subscribe((newSession) => {
+    // Subscribe to socket game manager updates
+    const unsubscribe = socketGameManager.subscribe((newSession) => {
       setSession(newSession);
     });
 
     // Load initial session
-    setSession(selectedGameManager.getSession());
+    setSession(socketGameManager.getSession());
 
-    // Load current player ID
-    const playerId = useSocketIO 
-      ? socketGameManager.getCurrentPlayerId()
-      : ''; // For localStorage version, we'll handle player ID differently
+    // Load current player ID from the socket manager
+    const playerId = socketGameManager.getCurrentPlayerId();
     if (playerId) {
       setCurrentPlayerId(playerId);
     }
@@ -45,8 +39,10 @@ function App() {
     const urlParams = new URLSearchParams(window.location.search);
     const roomFromUrl = urlParams.get('room');
     if (roomFromUrl && !session) {
-      // Room code will be handled by HomePage component
       console.log('Room code from URL:', roomFromUrl);
+      setRoomCodeFromUrl(roomFromUrl);
+      // Clear the URL parameter immediately to clean up the URL
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
 
     return unsubscribe;
@@ -55,15 +51,8 @@ function App() {
   const handleCreateGame = async (moderatorName: string, votingSystem: any): Promise<string> => {
     try {
       const roomCode = generateRoomCode();
-      
-      if (useSocketIO) {
-        const newSession = await socketGameManager.createSession(roomCode, moderatorName, votingSystem);
-        setCurrentPlayerId(newSession.moderatorId);
-      } else {
-        const newSession = gameManager.createSession(roomCode, moderatorName, votingSystem);
-        setCurrentPlayerId(newSession.moderatorId);
-      }
-      
+      const newSession = await socketGameManager.createSession(roomCode, moderatorName, votingSystem);
+      setCurrentPlayerId(newSession.moderatorId);
       return roomCode;
     } catch (error) {
       console.error('Failed to create game:', error);
@@ -73,11 +62,7 @@ function App() {
   };
 
   const handleLeaveGame = () => {
-    if (useSocketIO) {
-      socketGameManager.leaveSession();
-    } else {
-      gameManager.clearSession();
-    }
+    socketGameManager.leaveSession();
     setCurrentPlayerId('');
   };
 
@@ -86,6 +71,16 @@ function App() {
       {!session ? (
         <HomePage 
           onCreateGame={handleCreateGame}
+          onJoinGame={async (roomCode: string, playerName: string) => {
+            try {
+              const player = await socketGameManager.joinSession(roomCode, playerName);
+              setCurrentPlayerId(player.id);
+            } catch (error) {
+              console.error('Failed to join game:', error);
+              throw error;
+            }
+          }}
+          roomCodeFromUrl={roomCodeFromUrl || undefined}
         />
       ) : (
         <GameRoom 

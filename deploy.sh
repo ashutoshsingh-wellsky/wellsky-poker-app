@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# WellSky Scrum Poker Deployment Script
+# Scrum Poker Deployment Script
 
-echo "🚀 Preparing WellSky Scrum Poker for deployment..."
+echo "🚀 Preparing Scrum Poker for deployment..."
 
 # Build the application
 echo "📦 Building application..."

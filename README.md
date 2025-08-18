@@ -1,16 +1,14 @@
-# WellSky Scrum Poker - Internal Planning Tool
+# Scrum Poker - Planning & Estimation Tool
 
-A modern, real-time planning poker application designed specifically for WellSky teams to estimate user stories and tasks collaboratively. Features WellSky branding and optimized for internal team use.
+A modern, real-time planning poker application for agile teams to estimate user stories and tasks collaboratively. No database required - everything runs in the browser with real-time synchronization.
 
-![WellSky Scrum Poker](https://via.placeholder.com/800x400/0066cc/ffffff?text=WellSky+Scrum+Poker)
+![Scrum Poker Interface](https://via.placeholder.com/800x400/667eea/ffffff?text=Scrum+Poker+Interface)
 
 ## ✨ Features
 
-### 🎯 WellSky-Optimized Features
-- **Real-time Voting**: Instant Socket.IO-powered updates as team members cast their votes
+### 🎯 Core Functionality
+- **Real-time Voting**: Instant updates as team members cast their votes
 - **Multiple Voting Systems**: Fibonacci, T-Shirt sizes, Powers of 2, and more
-- **WellSky Branding**: Official WellSky logo and corporate styling
-- **Internal Team Tool**: Designed specifically for WellSky development teams
 - **Issue Management**: Add and manage user stories with descriptions and priorities
 - **Visual Results**: Beautiful charts and statistics for voting results
 - **Consensus Detection**: Automatic detection when team reaches agreement
@@ -22,10 +20,10 @@ A modern, real-time planning poker application designed specifically for WellSky
 - **Real-time Progress**: Live voting progress and player status updates
 
 ### 👥 Team Collaboration
-- **Room-based Sessions**: Create sessions with shareable links
-- **Real-time Socket.IO**: Live collaboration with instant updates
+- **Room-based Sessions**: Join games with simple 6-character room codes
 - **Player Roles**: Moderator controls and participant voting
-- **Session Management**: Easy session creation and team joining
+- **Spectator Mode**: Allow observers without voting rights
+- **Session History**: Track voting rounds and final estimates
 
 ## 🚀 Getting Started
 
@@ -37,14 +35,13 @@ A modern, real-time planning poker application designed specifically for WellSky
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/ashutoshsingh-wellsky/wellsky-poker-app.git
-   cd wellsky-poker-app
+   git clone <repository-url>
+   cd scrum-poker
    ```
 
 2. **Install dependencies**
    ```bash
    npm install
-   cd server && npm install && cd ..
    ```
 
 3. **Start development server**
@@ -52,12 +49,7 @@ A modern, real-time planning poker application designed specifically for WellSky
    npm run dev
    ```
 
-4. **Start Socket.IO server** (in another terminal)
-   ```bash
-   cd server && npm start
-   ```
-
-5. **Open your browser**
+4. **Open your browser**
    Navigate to `http://localhost:3000`
 
 ### Building for Production
@@ -69,42 +61,33 @@ npm run preview
 
 ## 🎮 How to Use
 
-### Creating a Session
-1. Enter your name as the organizer
-2. Choose a voting system (Fibonacci recommended)
-3. Click "Create Session & Get Link"
-4. Share the generated link with your WellSky team members
+### Creating a Game
+1. Click "Create Game" on the home page
+2. Enter your name as the moderator
+3. Choose a voting system (optional)
+4. Share the generated room code with your team
+
+### Joining a Game
+1. Click "Join Game" on the home page
+2. Enter your name and the room code
+3. Wait for the moderator to add issues
 
 ### Running a Voting Session
-1. **Organizer**: Add an issue with title and description
-2. **Organizer**: Start voting round
+1. **Moderator**: Add an issue with title and description
+2. **Moderator**: Click "Start Voting" to begin the round
 3. **All Players**: Select your estimate using the voting cards
-4. **Organizer**: Reveal votes when everyone has voted
+4. **Moderator**: Click "Reveal Votes" when everyone has voted
 5. **Team**: Discuss results and set final estimate
-6. **Organizer**: Move to next issue or end session
+6. **Moderator**: Start a new round or add the next issue
 
 ## 🛠️ Technical Stack
 
 - **Frontend**: React 18 with TypeScript
-- **Backend**: Node.js with Socket.IO for real-time features
-- **Styling**: Tailwind CSS with WellSky branding
+- **Styling**: Tailwind CSS
 - **Build Tool**: Vite
 - **Icons**: Lucide React
-- **State Management**: React hooks + Socket.IO GameManager
-- **Deployment**: Vercel-ready with production configuration
-
-## 🚀 Deployment Options
-
-### Vercel (Recommended)
-1. Connect your GitHub repository to Vercel
-2. Deploy automatically - Vercel will detect the Vite configuration
-3. For the Socket.IO server, deploy to Railway, Render, or Heroku
-
-### Manual Deployment
-```bash
-npm run build
-# Deploy the `dist` folder to your hosting provider
-```
+- **State Management**: React hooks + Custom GameManager
+- **Storage**: Browser localStorage
 
 ## 📊 Voting Systems
 
@@ -120,13 +103,23 @@ All systems include special cards:
 - **?** - Need more information
 - **☕** - Need a break
 
-## � WellSky Integration
+## 🎯 Key Features Explained
 
-This tool is specifically designed for WellSky's internal development teams:
-- **Corporate Branding**: Official WellSky logo and styling
-- **Internal Use**: Optimized for WellSky team workflows
-- **Agile Planning**: Supports WellSky's agile development processes
-- **Team Collaboration**: Real-time features for distributed teams
+### Real-time Synchronization
+The application uses a custom GameManager class that automatically synchronizes game state across all participants using browser storage and event listeners.
+
+### Visual Results Dashboard
+After votes are revealed, teams see:
+- **Vote Distribution**: Visual bar chart of all votes
+- **Statistics**: Average, median, and highest estimates
+- **Consensus Indicator**: Clear indication if team agrees
+- **Quick Actions**: Buttons to use common statistics as final estimate
+
+### Responsive Design
+The interface adapts to different screen sizes:
+- **Desktop**: Full sidebar layout with all features visible
+- **Tablet**: Responsive grid that stacks components efficiently
+- **Mobile**: Touch-friendly cards and optimized voting interface
 
 ## 🔧 Development
 
@@ -134,7 +127,7 @@ This tool is specifically designed for WellSky's internal development teams:
 ```
 src/
 ├── components/          # React components
-│   ├── HomePage.tsx    # WellSky-branded landing page
+│   ├── HomePage.tsx    # Landing page
 │   ├── GameRoom.tsx    # Main game interface
 │   ├── VotingCards.tsx # Card selection interface
 │   ├── ResultsPanel.tsx # Results visualization
@@ -142,11 +135,8 @@ src/
 │   ├── IssuePanel.tsx  # Issue display and controls
 │   └── GameHeader.tsx  # Header with room info
 ├── types/              # TypeScript interfaces
-├── utils/              # Game logic and Socket.IO management
+├── utils/              # Game logic and state management
 └── index.css          # Global styles and animations
-server/
-├── server.js           # Socket.IO server
-└── package.json        # Server dependencies
 ```
 
 ### Available Scripts
@@ -155,21 +145,63 @@ server/
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
 
-## 🎨 WellSky Branding
+### Customizing Voting Systems
+Add new voting systems by updating the `VOTING_SYSTEMS` object in `src/types/index.ts`:
 
-The application features:
-- **Official WellSky Logo**: Displayed prominently on the homepage
-- **Corporate Colors**: WellSky blue and professional gradients
-- **Internal Tool Messaging**: Clear indication this is for WellSky internal use
-- **Professional Design**: Clean, corporate-appropriate interface
+```typescript
+'custom': {
+  name: 'Custom System',
+  values: ['XS', 'S', 'M', 'L', 'XL', '?', '☕'],
+  description: 'Your custom voting system'
+}
+```
+
+## 🎨 Customization
+
+### Styling
+The application uses Tailwind CSS. Key color schemes:
+- **Primary**: Blue gradient (`from-blue-500 to-purple-600`)
+- **Success**: Green (`green-500`)
+- **Warning**: Orange (`orange-500`)
+- **Background**: Purple gradient (`from-blue-600 via-purple-600 to-blue-800`)
+
+### Animations
+Custom CSS animations include:
+- Card hover effects with scale and shadow
+- Pulse animations for selected cards
+- Reveal animations for results
+- Loading spinners and progress indicators
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Room code not working**
+   - Ensure the room code is exactly 6 characters
+   - Check that the moderator's session is still active
+
+2. **Votes not updating**
+   - Refresh the page to resync with localStorage
+   - Ensure JavaScript is enabled
+
+3. **Layout issues on mobile**
+   - Try refreshing the page
+   - Ensure you're using a modern browser
+
+### Browser Support
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
 ## 📝 License
 
-This project is developed for WellSky internal use.
+This project is open source and available under the [MIT License](LICENSE).
 
 ## 🤝 Contributing
 
-For WellSky team members:
+Contributions are welcome! Please feel free to submit a Pull Request.
+
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
@@ -178,8 +210,8 @@ For WellSky team members:
 
 ## 📞 Support
 
-For support or questions, please contact the WellSky development team or [open an issue](../../issues) on GitHub.
+If you have any questions or need support, please [open an issue](../../issues) on GitHub.
 
 ---
 
-**Ready for WellSky Teams! 🏢**
+**Happy Planning! 🎯**

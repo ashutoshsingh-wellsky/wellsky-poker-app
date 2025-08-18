@@ -1,7 +1,7 @@
 @echo off
-REM WellSky Scrum Poker Deployment Script for Windows
+REM Scrum Poker Deployment Script for Windows
 
-echo 🚀 Preparing WellSky Scrum Poker for deployment...
+echo 🚀 Preparing Scrum Poker for deployment...
 
 REM Build the application
 echo 📦 Building application...

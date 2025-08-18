@@ -13,7 +13,7 @@ const VotingCards: React.FC<VotingCardsProps> = ({ session, currentPlayerId, onV
 
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-      <h3 className="text-white text-lg font-semibold mb-4">Choose your estimate</h3>
+      <h3 className="text-white text-lg font-semibold mb-4">Choose Your Estimate</h3>
       
       <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
         {votingSystem.values.map((value) => {

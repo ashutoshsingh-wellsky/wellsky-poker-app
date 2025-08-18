@@ -1,4 +1,4 @@
-# WellSky Scrum Poker - Deployment Guide
+# Scrum Poker - Deployment Guide
 
 ## 🚀 Quick Deploy to Vercel (Recommended)
 
@@ -17,10 +17,10 @@ git init
 git add .
 
 # Commit changes
-git commit -m "Initial commit - WellSky Scrum Poker app"
+git commit -m "Initial commit - Scrum Poker app"
 
 # Add your GitHub repository
-git remote add origin https://github.com/YOUR_USERNAME/wellsky-scrum-poker.git
+git remote add origin https://github.com/YOUR_USERNAME/scrum-poker-app.git
 
 # Push to GitHub
 git push -u origin main
@@ -77,7 +77,7 @@ this.socket = io('https://your-app-name.vercel.app');
 
 ## 📋 Pre-Deployment Checklist
 
-- [ ] WellSky logo is in `public/` folder
+- [ ] App logo is in `public/` folder
 - [ ] All environment variables configured
 - [ ] CORS origins updated for production
 - [ ] Socket.IO URL updated for production
@@ -98,7 +98,7 @@ this.socket = io('https://your-app-name.vercel.app');
 ✅ Real-time voting with Socket.IO  
 ✅ Multiple voting systems (Fibonacci, T-shirt, etc.)  
 ✅ Session link sharing with clipboard copy  
-✅ WellSky branding and corporate styling  
+✅ Clean and professional styling  
 ✅ Mobile-responsive design  
 ✅ No database required (in-memory storage)  
 

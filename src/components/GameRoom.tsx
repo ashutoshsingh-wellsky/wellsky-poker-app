@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { VotingSession } from '../types';
 import { socketGameManager } from '../utils/socketGameManager';
-import { Copy, Users, LogOut, Eye, Share, Play } from 'lucide-react';
+import { Users, LogOut, Eye, Play, Check, Copy } from 'lucide-react';
 import VotingCards from './VotingCards';
 import PlayerList from './PlayerList';
 import ResultsPanel from './ResultsPanel';
@@ -13,19 +13,23 @@ interface GameRoomProps {
 }
 
 const GameRoom: React.FC<GameRoomProps> = ({ session, currentPlayerId, onLeaveGame }) => {
+  const [linkCopied, setLinkCopied] = useState(false);
   const currentPlayer = session.players.find(p => p.id === currentPlayerId);
   const isOrganizer = currentPlayerId === session.moderatorId;
   const allPlayersVoted = socketGameManager.getAllPlayersVoted();
 
   const shareableLink = `${window.location.origin}?room=${session.roomCode}`;
 
-  const copyShareLink = () => {
-    navigator.clipboard.writeText(shareableLink);
-    // Could add toast notification here
-  };
-
-  const copyRoomCode = () => {
-    navigator.clipboard.writeText(session.roomCode);
+  const copyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareableLink);
+      setLinkCopied(true);
+      // Hide the feedback after 2 seconds
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch (error) {
+      // Fallback for browsers that don't support clipboard API
+      console.error('Failed to copy link:', error);
+    }
   };
 
   const startVoting = () => {
@@ -45,13 +49,6 @@ const GameRoom: React.FC<GameRoomProps> = ({ session, currentPlayerId, onLeaveGa
                 <div className="bg-white/20 px-3 py-1 rounded-lg">
                   <span className="text-white text-sm font-mono">{session.roomCode}</span>
                 </div>
-                <button
-                  onClick={copyRoomCode}
-                  className="p-1 text-white/70 hover:text-white transition-colors"
-                  title="Copy room code"
-                >
-                  <Copy className="w-4 h-4" />
-                </button>
               </div>
 
               <div className="flex items-center space-x-1 text-white/70">
@@ -64,11 +61,24 @@ const GameRoom: React.FC<GameRoomProps> = ({ session, currentPlayerId, onLeaveGa
               {isOrganizer && (
                 <button
                   onClick={copyShareLink}
-                  className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
-                  title="Copy shareable link"
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                    linkCopied 
+                      ? 'bg-green-600 text-white' 
+                      : 'bg-green-500 hover:bg-green-600 text-white'
+                  }`}
+                  title={linkCopied ? "Link copied!" : "Copy shareable link"}
                 >
-                  <Share className="w-4 h-4" />
-                  <span>Share Link</span>
+                  {linkCopied ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>Link Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      <span>Copy Link</span>
+                    </>
+                  )}
                 </button>
               )}
               
@@ -139,20 +149,29 @@ const GameRoom: React.FC<GameRoomProps> = ({ session, currentPlayerId, onLeaveGa
               </div>
             )}
 
-            {/* Reveal Button */}
-            {session.isVotingActive && isOrganizer && allPlayersVoted && !session.isRevealed && (
-              <div className="text-center">
+            {/* Reveal Button - Organizer can reveal anytime */}
+            {session.isVotingActive && isOrganizer && !session.isRevealed && (
+              <div className="text-center space-y-4">
                 <button
                   onClick={() => socketGameManager.revealVotes()}
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg animate-pulse transition-all transform hover:scale-105"
+                  className={`px-8 py-4 rounded-lg font-semibold text-lg transition-all transform hover:scale-105 ${
+                    allPlayersVoted 
+                      ? 'bg-orange-500 hover:bg-orange-600 text-white animate-pulse' 
+                      : 'bg-orange-600 hover:bg-orange-700 text-white'
+                  }`}
                 >
-                  🎉 Reveal All Points
+                  🎉 {allPlayersVoted ? 'Reveal All Points' : 'Reveal Points Now'}
                 </button>
+                {!allPlayersVoted && (
+                  <p className="text-orange-200 text-sm">
+                    You can reveal results anytime, even if not everyone has voted yet
+                  </p>
+                )}
               </div>
             )}
 
             {/* Waiting for All Votes */}
-            {session.isVotingActive && !allPlayersVoted && !session.isRevealed && (
+            {session.isVotingActive && !allPlayersVoted && !session.isRevealed && !isOrganizer && (
               <div className="bg-blue-500/20 border border-blue-500/30 rounded-xl p-4 text-center">
                 <p className="text-white font-medium">Waiting for all team members to vote...</p>
                 <div className="mt-2">
