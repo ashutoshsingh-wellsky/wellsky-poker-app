@@ -1,33 +1,17 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    },
-    {
-      "src": "api/socket.js",
-      "use": "@vercel/node"
+  "functions": {
+    "api/socket.js": {
+      "maxDuration": 30
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/socket.io/(.*)",
-      "dest": "/api/socket.js"
+      "source": "/socket.io/(.*)",
+      "destination": "/api/socket.js"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "/api/socket.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/dist/$1"
+      "source": "/api/(.*)",
+      "destination": "/api/socket.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
