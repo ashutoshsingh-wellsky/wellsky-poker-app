@@ -11,7 +11,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "start": "npm run build && npm run server",
-    "vercel-build": "npm run build"
+    "vercel-build": "npm run build",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel"
   },
   "dependencies": {
     "clsx": "^2.0.0",

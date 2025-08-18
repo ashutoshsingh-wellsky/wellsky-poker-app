@@ -15,16 +15,17 @@ class SocketGameManager {
     // Use environment-specific URL
     const socketUrl = window.location.hostname === 'localhost'
       ? 'http://localhost:3001'
-      : window.location.origin; // Use same origin for production
+      : window.location.origin; // Use same origin for production (Vercel)
       
     this.socket = io(socketUrl, {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'], // Polling first for Vercel compatibility
       upgrade: true,
       timeout: 20000,
       forceNew: true,
       reconnection: true,
       reconnectionDelay: 1000,
-      reconnectionAttempts: 5
+      reconnectionAttempts: 5,
+      path: '/socket.io/' // Ensure correct path for Vercel routing
     });
 
     // Socket event listeners

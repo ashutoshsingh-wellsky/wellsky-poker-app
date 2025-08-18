@@ -95,4 +95,7 @@ dist
 tmp/
 temp/
 
+# Vercel
+.vercel
+
 # Editor directories and files - duplicate section removed

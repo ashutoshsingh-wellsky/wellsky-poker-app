@@ -9,14 +9,18 @@
       }
     },
     {
-      "src": "server/server.js",
+      "src": "api/socket.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
+      "src": "/socket.io/(.*)",
+      "dest": "/api/socket.js"
+    },
+    {
       "src": "/api/(.*)",
-      "dest": "/server/server.js"
+      "dest": "/api/socket.js"
     },
     {
       "src": "/(.*)",
@@ -24,8 +28,11 @@
     }
   ],
   "functions": {
-    "server/server.js": {
+    "api/socket.js": {
       "maxDuration": 30
     }
+  },
+  "env": {
+    "NODE_ENV": "production"
   }
 }

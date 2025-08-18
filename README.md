@@ -59,6 +59,34 @@ npm run build
 npm run preview
 ```
 
+### 🌐 Deployment
+
+#### Deploy to Vercel (Recommended)
+The easiest way to deploy your Scrum Poker app:
+
+```bash
+# Option 1: Automatic deployment script
+./deploy-vercel.bat  # Windows
+./deploy-vercel.sh   # Mac/Linux
+
+# Option 2: Manual deployment
+npm install -g vercel
+vercel --prod
+```
+
+**Features included in Vercel deployment:**
+- ✅ Full-stack deployment (Frontend + Backend)
+- ✅ Real-time Socket.IO support  
+- ✅ Auto-scaling serverless functions
+- ✅ Global CDN for static assets
+- ✅ Automatic SSL/HTTPS
+- ✅ Zero-downtime deployments
+
+For detailed deployment instructions, see [`VERCEL_DEPLOYMENT.md`](./VERCEL_DEPLOYMENT.md)
+
+#### Other Platforms
+- Railway, Render, and Docker configurations available in [`DEPLOYMENT.md`](./DEPLOYMENT.md)
+
 ## 🎮 How to Use
 
 ### Creating a Game

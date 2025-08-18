@@ -6,18 +6,40 @@ import cors from 'cors';
 const app = express();
 const server = createServer(app);
 
+// Configure CORS for Socket.IO with dynamic origin
+const getAllowedOrigins = () => {
+  if (process.env.NODE_ENV === 'production') {
+    // Add your Vercel app URL here once you know it
+    const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
+    const customDomain = process.env.CUSTOM_DOMAIN ? `https://${process.env.CUSTOM_DOMAIN}` : null;
+    
+    return [
+      vercelUrl,
+      customDomain,
+      // Add your custom domain here if you have one
+      // "https://your-custom-domain.com"
+    ].filter(Boolean);
+  } else {
+    return ["http://localhost:3000", "http://localhost:5173", "http://localhost:3003"];
+  }
+};
+
 // Configure CORS for Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' 
-      ? ["https://your-app-name.vercel.app"] 
-      : ["http://localhost:3000", "http://localhost:5173", "http://localhost:3003"],
+    origin: getAllowedOrigins(),
     methods: ["GET", "POST"],
     credentials: true
-  }
+  },
+  transports: ['polling', 'websocket'],
+  allowEIO3: true
 });
 
-app.use(cors());
+app.use(cors({
+  origin: getAllowedOrigins(),
+  methods: ["GET", "POST"],
+  credentials: true
+}));
 app.use(express.json());
 
 // Store game sessions in memory (in production, use Redis or database)
@@ -294,8 +316,22 @@ app.get('/sessions', (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 
-server.listen(PORT, () => {
-  console.log(`🚀 Scrum Poker server running on port ${PORT}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-  console.log(`📊 Sessions info: http://localhost:${PORT}/sessions`);
-});
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  server.listen(PORT, () => {
+    console.log(`🚀 Scrum Poker server running on port ${PORT}`);
+    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+    console.log(`📊 Sessions info: http://localhost:${PORT}/sessions`);
+  });
+}
+
+// Export for Vercel serverless functions
+export default function handler(req, res) {
+  if (!res.socket.server.io) {
+    console.log('Setting up Socket.IO server for Vercel...');
+    res.socket.server.io = io;
+  }
+  
+  // Handle the request with Express
+  app(req, res);
+}
